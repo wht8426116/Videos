@@ -1,0 +1,5 @@
+com\wht\controller\SpeakerController.class
+com\wht\controller\CourseController.class
+com\wht\controller\VideoManager.class
+com\wht\controller\Login.class
+com\wht\controller\UserController.class

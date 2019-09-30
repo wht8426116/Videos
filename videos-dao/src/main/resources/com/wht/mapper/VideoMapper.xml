@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wht.mapper.VideoMapper">
+
+    <resultMap id="courseMap" type="course">
+        <id property="id" column="id"/>
+        <result property="courseTitle" column="course_title"/>
+    </resultMap>
+
+    <resultMap id="speakerMap" type="speaker">
+        <id property="id" column="id"/>
+        <result property="speakerName" column="speaker_name"/>
+    </resultMap>
+
+    <resultMap id="videoMap" type="video">
+        <id property="id" column="id"/>
+        <result property="playNum" column="play_num"/>
+        <result property="speakerName" column="speaker_name"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="videoUrl" column="video_url"/>
+        <result property="speakerId" column="speaker_id"/>
+        <result property="courseId" column="course_id"/>
+    </resultMap>
+    <resultMap id="videoMaps" type="video">
+        <id property="id" column="id"/>
+        <result property="playNum" column="play_num"/>
+        <result property="speakerName" column="speaker_name"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="videoUrl" column="video_url"/>
+        <result property="speakerId" column="speaker_id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="title" column="title"/>
+        <result property="detail" column="detail"/>
+        <result property="course_id" column="courseId"/>
+        <association property="speaker" javaType="speaker">
+            <id property="id" column="sid"/>
+            <result property="speakerName" column="speaker_name"/>
+            <result property="speakerDesc" column="speaker_desc"/>
+            <result property="headImgUrl" column="head_img_url"/>
+        </association>
+    </resultMap>
+
+    <select id="selectAll" resultType="video">
+        select * from video;
+    </select>
+    <select id="getCourseTitle" resultMap="courseMap">
+        select id,course_title from course
+    </select>
+    <select id="getSpeakerName" resultMap="speakerMap">
+        select id,speaker_name from speaker
+    </select>
+
+    <select id="conditionQuery" parameterType="videoQueryVo" resultMap="videoMap">
+        select v.id,v.title,v.detail,s.speaker_name,v.time,v.play_num from video v inner join speaker s
+        on v.speaker_id=s.id
+        <where>
+            <if test="title != null and title != ''">
+                and v.title like concat('%',#{title},'%')
+            </if>
+            <if test="speakerId != 0">
+                and v.speaker_id=#{speakerId}
+            </if>
+            <if test="courseId != 0">
+                and v.course_id=#{courseId}
+            </if>
+        </where>
+        limit #{begin},#{rows}
+    </select>
+    <select id="numberQuery" parameterType="videoQueryVo" resultType="int">
+        select count(1) from video v,speaker s
+        where v.speaker_id=s.id
+        <if test="title != null and title != ''">
+            and v.title like concat('%'#{title}'%')
+        </if>
+        <if test="speakerId != 0">
+            and v.speaker_id=#{speakerId}
+        </if>
+        <if test="courseId != 0">
+            and v.course_id=#{courseId}
+        </if>
+    </select>
+
+    <select id="selectVideoById" parameterType="int" resultMap="videoMap">
+        select * from video where id=#{id}
+    </select>
+
+    <select id="selectVideoByIdd" parameterType="int" resultMap="videoMaps">
+        select v.*,s.id as sid,s.speaker_name,s.speaker_desc,s.head_img_url from video v,speaker s where v.speaker_id = s.id and v.id=#{id}
+    </select>
+
+    <insert id="addVideo" parameterType="video">
+        insert into video(title,speaker_id,course_id,time,image_url,video_url,detail) values(#{title},#{speakerId},#{courseId},#{time},#{imageUrl},#{videoUrl},#{detail})
+    </insert>
+
+    <update id="updateVideo" parameterType="video">
+        update video set title=#{title},speaker_id=#{speakerId},course_id=#{courseId},time=#{time},image_url=#{imageUrl},video_url=#{videoUrl},detail=#{detail} where id=#{id}
+    </update>
+    <delete id="deleteById" parameterType="int">
+        delete from video where id=#{id}
+    </delete>
+
+    <delete id="delBatchVideos" parameterType="VideoQueryVo">
+        delete from Video where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="updatePlayNum" parameterType="Video" >
+        update video set play_num=#{playNum} where id=#{id}
+    </update>
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--加载外部的配置文件，便于xml中使用-->
+    <properties resource="dbconfig/db.properties"/>
+    <settings>
+        <!--新的spring和Mybatis整合，日志要加上这句话-->
+        <setting name="logImpl" value="log4j"/>
+    </settings>
+
+    <!--起别名 可以单个起，也可以指定一个包起名别-->
+    <typeAliases>
+        <!--<typeAlias type="com.qfedu.entry.Admin"/>-->
+        <package name="com.wht.entry"/>
+    </typeAliases>
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
+            <property name="helperDialect" value="mysql"/>
+            <!--该参数的意思是：5.分页合理化参数，默认值为 false 。当该参数设置为 true 时
+              时会查询第一页， pageNum>pages （超过总数时），会查询最后一页。默认 false 时，直接根据参数进行查询-->
+            <property name="reasonable" value="false"/>
+        </plugin>
+    </plugins>
+
+
+    <!-- 和spring整合后 environments配置将废除 -->
+    <environments default="development">
+        <environment id="development">
+            <!-- 使用jdbc事务管理 -->
+            <transactionManager type="JDBC" />
+            <!-- 数据库连接池 -->
+            <dataSource type="com.wht.utils.DruidUtil">
+                <property name="driverClassName" value="${jdbc.driver}" />
+                <property name="url"
+                          value="${jdbc.url}" />
+                <property name="username" value="${jdbc.username}" />
+                <property name="password" value="${jdbc.password}" />
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--小的mapper配置文件需要在大的核心配置文件中声明一下，否则无法加载-->
+    <mappers>
+        <!--<mapper resource="com/wht/mapper/VideoMapper.xml"/>-->
+        <!--<mapper resource="com/qfedu/mapper/VideoMapper.xml"/>
+        <mapper resource="com/qfedu/mapper/AdminMapper.xml"/>-->
+        <!--将某个包下的所有xml资源全部加载进来-->
+        <!--规则：要想使用package 必须xml和接口名称必须一致，包路径也一致-->
+        <package name="com.wht.mapper"/>
+    </mappers>
+</configuration>
